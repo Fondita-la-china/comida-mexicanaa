@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fondita Chayo la China</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #fff5e1;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+        header {
+            background-color: #f6dfde;
+            color: white;
+            padding: 1em 0;
+            text-align: center;
+        }
+        header h1 {
+            font-size: 2.5em;
+            margin: 0;
+        }
+        header h2 {
+            font-size: 1.5em;
+            margin: 0;
+            font-style: italic;
+        }
+        main {
+            padding: 2em;
+        }
+        h1, h2 {
+            color: #d9534f;
+        }
+        .menu-section {
+            margin-bottom: 2em;
+        }
+        .menu-item {
+            display: flex;
+            justify-content: space-between;
+            margin: 0.5em 0;
+            align-items: center;
+        }
+        .menu-item img {
+            width: 100px;
+            height: auto;
+            margin-right: 1em;
+        }
+        .order-form {
+            background-color: #f7f7f7;
+            padding: 2em;
+            border-radius: 8px;
+            margin-top: 2em;
+        }
+        .order-form h2 {
+            margin-top: 0;
+        }
+        .order-form label {
+            display: block;
+            margin-top: 1em;
+        }
+        .order-form input, .order-form select {
+            width: 100%;
+            padding: 0.5em;
+            margin-top: 0.5em;
+        }
+        .order-form button {
+            background-color: #d9534f;
+            color: white;
+            padding: 1em;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 1em;
+        }
+        footer {
+            background-color: #d9534f;
+            color: white;
+            text-align: center;
+            padding: 1em 0;
+            position: fixed;
+            width: 100%;
+            bottom: 0;
+        }
+        footer ul {
+            list-style: none;
+            padding: 0;
+        }
+        footer ul li {
+            display: inline;
+            margin: 0 10px;
+        }
+        footer ul li a {
+            color: white;
+            text-decoration: none;
+        }
+        .map-container {
+            width: 100%;
+            height: 400px;
+            margin-top: 2em;
+        }
+        #map {
+            width: 100%;
+            height: 100%;
+        }
+        .contact-icons {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+        }
+        .contact-icons a {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            background-color: #d9534f;
+            color: white;
+            text-align: center;
+            line-height: 40px;
+            font-size: 20px;
+            margin-left: 10px;
+            border-radius: 50%;
+            transition: transform 0.3s ease;
+        }
+        .contact-icons a:hover {
+            transform: scale(1.1);
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css">
+    <script src="https://kit.fontawesome.com/a076d05399.js"></script>
+    <script>
+        function sendOrder() {
+            const items = [];
+            document.querySelectorAll('.order-item').forEach(item => {
+                const type = item.querySelector('.item-type').value;
+                const size = item.querySelector('.item-size').value;
+                const quantity = item.querySelector('.item-quantity').value;
+                if (quantity > 0) {
+                    items.push(`${quantity} x ${size} ${type}`);
+                }
+            });
+
+            let orderText = items.join(', ');
+            let totalCost = items.reduce((total, item) => {
+                const quantity = parseInt(item.split(' x ')[0]);
+                return total + quantity * 20; // Precio ficticio por item, ajustar según sea necesario
+            }, 0);
+
+            const needsDelivery = document.getElementById('needs-delivery').checked;
+            if (needsDelivery) {
+                const address = document.getElementById('delivery-address').value;
+                if (address) {
+                    orderText += `\nDirección: ${address}`;
+                    totalCost += 20; // Costo de envío
+                } else {
+                    alert('Por favor, ingrese su dirección de envío.');
+                    return;
+                }
+            }
+
+            orderText += `\nTotal: $${totalCost}`;
+            const whatsappUrl = `https://wa.link/bw3bqd`;
+            window.open(whatsappUrl, '_blank');
+        }
+
+        function showMenu(selectedDay) {
+            const menuSections = document.querySelectorAll('.menu-section');
+            menuSections.forEach(section => {
+                section.style.display = 'none';
+            });
+
+            if (selectedDay) {
+                document.getElementById(selectedDay).style.display = 'block';
+                // Actualizar opciones del carrito de compras
+                const menuItems = document.querySelectorAll(`#${selectedDay} .menu-item`);
+                const select = document.getElementById('item1-type');
+                select.innerHTML = ''; // Limpiar opciones existentes
+
+                menuItems.forEach(item => {
+                    const itemName = item.querySelector('span').textContent;
+                    const option = document.createElement('option');
+                    option.value = itemName;
+                    option.textContent = itemName;
+                    select.appendChild(option);
+                });
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            AOS.init({
+                duration: 1200,
+            });
+
+            const deliveryCheckbox = document.getElementById('needs-delivery');
+            deliveryCheckbox.addEventListener('change', function() {
+                const addressField = document.getElementById('delivery-address-field');
+                if (this.checked) {
+                    addressField.style.display = 'block';
+                } else {
+                    addressField.style.display = 'none';
+                }
+            });
+        });
+    </script>
+</head>
+<body>
+
+<header>
+    <h1>Fondita Chayo la China</h1>
+    <h2>Delicias Tradicionales</h2>
+</header>
+
+<main>
+    <section>
+        <label for="menu-day">Seleccione el día:</label>
+        <select id="menu-day" onchange="showMenu(this.value)">
+            <option value="">--Seleccione--</option>
+            <option value="monday-menu">Lunes</option>
+            <option value="tuesday-menu">Martes</option>
+            <option value="wednesday-menu">Miércoles</option>
+            <option value="thursday-menu">Jueves</option>
+            <option value="friday-menu">Viernes</option>
+            <option value="saturday-menu">Sábado</option>
+            <option value="sunday-menu">Domingo</option>
+        </select>
+    </section>
+
+    <section id="monday-menu" class="menu-section" data-aos="fade-up" style="display: none;">
+        <h2>Menú del Lunes</h2>
+        <div class="menu-item"><img src="tacos de barbacoa.jpg" alt="Tacos de Barbacoa"><span>Tacos de Barbacoa</span></div>
+        <div class="menu-item"><img src="gorditas-de-picadillo-closeup-683x1024.jpg" alt="Gordita de Picadillo"><span>Gorditas de Picadillo</span></div>
+        <div class="menu-item"><img src="gorditas.jpg" alt="Gordita de Frijoles"><span>Gorditas de Frijoles</span></div>
+        <div class="menu-item"><img src="bionico.jpeg" alt="Biónico Grande"><span>Biónico Grande</span></div>
+        <div class="menu-item"><img src="bionico.jpeg" alt="Biónico Chico"><span>Biónico Chico</span></div>
+    </section>
+
+    <section id="tuesday-menu" class="menu-section" data-aos="fade-up" style="display: none;">
+        <h2>Menú del Martes</h2>
+        <div class="menu-item"><img src="gorditas.jpg" alt="Gordita de Chicharrón"><span>Gorditas de Chicharrón</span></div>
+        <div class="menu-item"><img src="gorditas.jpg" alt="Gordita de Lengua"><span>Gorditas de Lengua</span></div>
+        <div class="menu-item"><img src="gorditas.jpg" alt="Gordita de Frijoles"><span>Gorditas de Frijoles</span></div>
+        <div class="menu-item"><img src="gorditas papas con chorizo.avif" alt="Gordita de Papas con Chorizo"><span>Gorditas de Papas con Chorizo</span></div>
+    </section>
+
+    <section id="wednesday-menu" class="menu-section" data-aos="fade-up" style="display: none;">
+        <h2>Menú del Miércoles</h2>
+        <div class="menu-item"><img src="tortas ahogada new.jpeg" alt="Torta Ahogada"><span>Tortas Ahogadas</span></div>
+        <div class="menu-item"><img src="lonche de pierna new.jpeg" alt="Lonche de Pierna"><span>Lonches de Pierna</span></div>
+        <div class="menu-item"><img src="panela.jpeg" alt="Lonche de Panela"><span>Lonches de Panela</span></div>
+        <div class="menu-item"><img src="lomo.jpeg" alt="Lonche de Lomo"><span>Lonches de Lomo</span></div>
+    </section>
+
+    <section id="thursday-menu" class="menu-section" data-aos="fade-up" style="display: none;">
+        <h2>Menú del Jueves</h2>
+        <div class="menu-item"><img src="sopes.jpg" alt="Sope"><span>Sopes</span></div>
+        <div class="menu-item"><img src="enchiladas new.jpeg" alt="Enchiladas"><span>Enchiladas</span></div>
+        <div class="menu-item"><img src="tacos dorados new.jpeg" alt="Tacos Dorados"><span>Tacos Dorados</span></div>
+    </section>
+
+    <section id="friday-menu" class="menu-section" data-aos="fade-up" style="display: none;">
+        <h2>Menú del Viernes</h2>
+        <div class="menu-item"><img src="quezadillas fritassss.jpeg" alt="Quesadilla de Champiñón"><span>Quesadillas Fritas de Champiñón</span></div>
+        <div class="menu-item"><img src="quezadillas fritassss.jpeg" alt="Quesadilla de Camarón"><span>Quesadillas Fritas de Camarón</span></div>
+        <div class="menu-item"><img src="quezadillas fritassss.jpeg" alt="Quesadilla de Rajas"><span>Quesadillas Fritas de Rajas</span></div>
+        <div class="menu-item"><img src="quezadillas fritassss.jpeg" alt="Quesadilla de Pierna"><span>Quesadillas Fritas de Pierna</span></div>
+    </section>
+
+    <section id="saturday-menu" class="menu-section" data-aos="fade-up" style="display: none;">
+        <h2>Menú del Sábado</h2>
+        <div class="menu-item"><img src="pozole.jpeg" alt="Pozole Chico"><span>Pozole Chico</span></div>
+        <div class="menu-item"><img src="pozole.jpeg" alt="Pozole Grande"><span>Pozole Grande</span></div>
+        <div class="menu-item"><img src="sopes.jpg" alt="Sopes de Picadillo"><span>Sopes de Picadillo</span></div>
+        <div class="menu-item"><img src="sopes.jpg" alt="Sopes de Requesón"><span>Sopes de Requesón</span></div>
+        <div class="menu-item"><img src="sopes.jpg" alt="Sopes de Papa"><span>Sopes de Papa</span></div>
+        <div class="menu-item"><img src="tacos dorados new.jpeg" alt="Tacos Dorados de Picadillo"><span>Tacos Dorados de Picadillo</span></div>
+        <div class="menu-item"><img src="tacos dorados new.jpeg" alt="Tacos Dorados de Frijoles"><span>Tacos Dorados de Frijoles</span></div>
+    </section>
+
+    <section id="sunday-menu" class="menu-section" data-aos="fade-up" style="display: none;">
+        <h2>Menú del Domingo</h2>
+        <div class="menu-item"><img src="gorditas-de-picadillo-closeup-683x1024.jpg" alt="Gordita de Picadillo"><span>Gorditas de Picadillo</span></div>
+        <div class="menu-item"><img src="gorditas.jpg" alt="Gordita de Chicharrón"><span>Gorditas de Chicharrón</span></div>
+        <div class="menu-item"><img src="gorditas papas con chorizo.avif" alt="Gordita de Papas con Chorizo"><span>Gorditas de Papas con Chorizo</span></div>
+        <div class="menu-item"><img src="gorditas.jpg" alt="Gordita de Lengua"><span>Gorditas de Lengua</span></div>
+        <div class="menu-item"><img src="tacos de barbacoa.jpg" alt="Tacos de Barbacoa"><span>Tacos de Barbacoa</span></div>
+        <div class="menu-item"><img src="lonche de barbacoa.jpeg" alt="Lonches de Barbacoa"><span>Lonches de Barbacoa</span></div>
+    </section>
+
+    <section class="order-form" data-aos="fade-up">
+        <h2>Carrito de Compras</h2>
+        <div class="order-item">
+            <label for="item1-type">Selecciona el platillo:</label>
+            <select id="item1-type" class="item-type">
+                <!-- Opciones se llenan dinámicamente -->
+            </select>
+           
+            </select>
+            <label for="item1-quantity">Cantidad:</label>
+            <input type="number" id="item1-quantity" class="item-quantity" value="0" min="0">
+        </div>
+        <label for="item1-quantity">Numero de platos:</label>
+        <input type="number" id="item1-quantity" class="item-quantity" value="0" min="0">
+        <div id="delivery-option">
+            <input type="checkbox" id="needs-delivery">
+            <label for="needs-delivery">¿Requiere entrega a domicilio?</label>
+            <div id="delivery-address-field" style="display: none;">
+                <label for="delivery-address">Dirección de entrega:</label>
+                <input type="text" id="delivery-address">
+            </div>
+        </div>
+
+        <button onclick="sendOrder()">Enviar Pedido por WhatsApp</button>
+    </section>
+
+    
+        <h2>Ubicación</h2>
+        <a href="https://maps.app.goo.gl/6zYGAMhCJCpULrHX9?g_st=com.google.maps.preview.copy" target="_blank"><img src="ubicacion.jpeg" width="50" height="50"></a>
+    </div>
+</main>
+<section id="contacto">
+    <h2>Contacto</h2>
+    <p>Para más información, contáctenos:</p>
+    <p>Teléfono: <a href="tel:+523747450551">374-75-50551</a></p>
+    <p><a href="https://www.facebook.com/fonditachayo.lachina?mibextid=LQQJ4d" target="_blank"><i class="fab fa-facebook-square"></i> Síguenos en Facebook</a></p>
+</section>
+<div class="contact-icons">
+    <a href="https://wa.link/bw3bqd" target="_blank"><img src="whatsaap.jpeg"  width="50" height="50">  </a>
+    <a href="https://www.facebook.com/fonditachayo.lachina?mibextid=LQQJ4d" target="_blank"><img src="facebook.jpeg" width="50" height="50"></a>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+<script>
+    AOS.init();
+    
+</script>
+
+</body>
+</html>
